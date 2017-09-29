@@ -1,0 +1,39 @@
+{
+  "name": "interview-skill-assessment",
+  "version": "0.0.0",
+  "description": "This is my interview skills assessment of React. \\nBuild a web app that display past events for this user ID \"X8RVN508nc\" using React JS. \\nUse ReactJS, Parse Javascipt SDK, Parse Cloud code, with any front-end design framework, and Heroku deployment... \\n1. Build a React app to display list of past events that this user has attended. \\n2.Use Parse Javascript SDK to call getCheckin to get past events with a set userid param (refer to Parse cloud code doc). \\n3. List event photo, event name, event date & time, total attendee count for event. \\n4. Write necessary unit test cases. \\n5. Deploy on Heroku. ",
+  "main": "./src/js/client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slopez15/InterviewSkillAssessment.git"
+  },
+  "keywords": [
+    "React",
+    "ReactJS",
+    "JS",
+    "Javascript",
+    "Prse",
+    "Javascript",
+    "Parse",
+    "Javascript",
+    "SDK",
+    "Bootstrap",
+    "Heroku",
+    "getCheckIn",
+    "unit",
+    "test",
+    "cases"
+  ],
+  "author": "Saul Lopez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/slopez15/InterviewSkillAssessment/issues"
+  },
+  "homepage": "https://github.com/slopez15/InterviewSkillAssessment#readme",
+  "devDependencies": {
+    "create-react-app": "^1.4.0"
+  }
+}
