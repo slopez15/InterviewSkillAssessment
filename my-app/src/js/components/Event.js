@@ -1,15 +1,57 @@
 import React, { Component } from 'react';
 import { Table } from "react-bootstrap";
-import Parse from "parse";
-import Keys from "../other/Keys.key.js";
+import { Parse } from "parse";
+// import { Parse } from "parse-server";
+import Keys from "../other/Keys.key.js"; //better to import where needed. Don't place where need to pass to other Components.
+
+/* TODO
+unit tests
+deploy Heroku
+
+SEND COMPLETED PROJECT TO: Keyul Shah - Keyul@asu.edu
+GitHub repository – to see the code
+Heroku deployment URL – to see the actual working project
+
+*/
 
 export default class Event extends Component {
+  constructor(){
+    super();
+    this.state = {
+      "userId": Keys.userId,
+      "tableHeading": null,
+      "events": null,
+    };//Need a way for site to update after getting data from elsewhere.
+  }
   render() {
-    //Temporary HardCode
-    const appID = Keys.appID;
-    const userID = Keys.userID;
-    const serverURL = Keys.serverURL;
-    const headLines = [
+    const tableHeading = getTableHeading();
+    const userEventData = getUserEventData (this.state.userId);
+    const userEventDataFormatted = getUserEventDataFormatted (userEventData);
+
+
+    // {tableHeading}
+    //   {jsxEventsData}
+    //HTML <Event />
+    return (
+      <div className="Event">
+        <h1>Below is a list of events from user {this.state.userId}!</h1>
+        <Table striped bordered condensed hover>
+          <thead>
+            <tr>
+
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </Table>
+
+      </div>
+    );
+  }
+  /*global getTableHeading*/
+  getTableHeading () {
+    const tableHeading = [
       "#",
       "eventPhoto",
       "eventName",
@@ -17,121 +59,111 @@ export default class Event extends Component {
       "eventTime",
       "eventAttendeeCount",
     ].map( (key, i) => <th key={i}>{key}</th> );
-    const events = [
-      { "eventPhoto":"p1", "eventName":"e1", "eventDate":"d1", "eventTime":"t1", "eventAttendeeCount":"ac1" },
-      { "eventPhoto":"p2", "eventName":"e2", "eventDate":"d2", "eventTime":"t2", "eventAttendeeCount":"ac2" },
-      { "eventPhoto":"p3", "eventName":"e3", "eventDate":"d3", "eventTime":"t3", "eventAttendeeCount":"ac3" },
-    ].map( (key, i) => <tr key={i}><td key={i}>{i}</td><td>{key.eventPhoto}</td><td>{key.eventName}</td><td>{key.eventDate}</td><td>{key.eventTime}</td><td>{key.eventAttendeeCount}</td></tr> );
-
-
-
-
-    //Parse for event information
-    /*
-    1. Have you used parse JavaScript SDK with React?
-      /
-    2. Have you tried to pass API ID before calling 'getcheckIn' function?
-      .
-    3. Have you mentioned 'getcheckIn' function name in parse.cloud.define() ?
-      .
-    4. Have you passed userId as a parameter in parse.cloud.define()?
-      .
-    .
-    */
-    Parse.initialize("my-app");
-    Parse.serverURL = serverURL;
-    console.log("Event Print");
-    console.log("Parse.Cloud: ", Parse.Cloud );
-    console.log("Keys: ", appID, "\n", userID );
-    /*
-    Parse.Cloud.define( "getCheckIn", (request, response) => {
-      //const query = new Parse.Query("Hello World!");
-      response.success ("Hello World!");
-      //userId
-    } );
-    */
-/*
-    //
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("userId", "X8RVN508nc");
-
-
-    //
-    Parse.Cloud.define("getCheckIn", function(request, response) {
-      const query = new Parse.Query("userId");
-    });
-*/
-
-
-
+    this.setState({ tableHeading });
+    return tableHeading;
+  }
+  /*global getUserEventData*/
+  getUserEventData (_userId){
+    //Obtain past events, and event data, of a particular user. //should return a list of event objects and their details. [{event1Data}, ...]
     return (
-      <div className="Event">
-        <h1>Events - Below is a list of events from user User!</h1>
-        <Table striped bordered condensed hover>
-          <thead>
-            <tr>
-              {headLines}
-            </tr>
-          </thead>
-          <tbody>
-            {events}
-          </tbody>
-        </Table>
-
-      </div>
+      Parse.Cloud.run('getCheckIn', { userId: _userId }).then( (ParseObjectList) => {
+        console.log("ParseObjectList: ", ParseObjectList);
+        return (ParseObjectList.map( (ParseObject, i) => {
+          let eventData = ParseObject.attributes;
+          let eventPhoto = eventData.image._url;
+          let eventName = eventData.name;
+          //TODO Decide: Should I split start/end date into start/end date & start/end time.
+          let eventStartDate = eventData.startDate;
+          let eventEndDate = eventData.endDate;
+          let eventAttendeeCount = eventData.attendeeCount;
+          return ({ eventPhoto, eventName, eventStartDate, eventEndDate, eventAttendeeCount });
+        }));
+      }).then( (events) => {
+        this.setState({ events });
+        console.log("events: ", events);
+        return events;
+      })
     );
   }
-}
+  /*global getUserEventDataFormatted*/
+  getUserEventDataFormatted (_userEventData){
+    return (
+      _userEventData.then( (events) => {
+        //events is [{}, {}, (...)]
+        return (events.map( (key, i) =>
+          <tr key={i}><td key={i}>{i}</td><td>{key.eventPhoto}</td><td>{key.eventName}</td><td>{key.eventStartDate}</td><td>{key.eventEndDate}</td><td>{key.eventAttendeeCount}</td></tr>
+        ))
+      })
+    );
+  }
+
+
+
+} //class Event
 
 
 
 /* SCRATCH
-
-
-
-.
-
-
 //const { eventPhoto,  eventName,  eventDate,  eventTime, eventAttendeeCount } = this.props;
-
-
 //<Col xs={6} md={4}>{Events}</Col>
-//        eventPhoto: {eventPhoto}, eventName: {eventName}, eventDate: {eventDate}, eventTime: {eventTime}, eventAttendeeCount: {eventAttendeeCount}
-// .map()(title, i) => <Event key={i} eventPhoto={eventPhoto} eventName={eventName} eventDate={eventDate} eventTime={eventTime} eventAttendeeCount={eventAttendeeCount} />
+*/
 
 
+/*
+Tree of Data obtained
+I Need:
+  eventPhoto, eventName, eventDate, eventTime, eventAttendeeCount
+Structure-Abridged:
+ParseObjectList[
+  *ParseObject: {
+    *attributes: {
+      //What we want
+      name: "Startup Weekend Artificial Intelligence - Paris 2nd Edition"
+      image: ParseFile {
+        _name: "0c497f9d0e6a1f80024f792e60a3dae7_event_image.jpg"
+        _url: "http://eventkey.herokuapp.com/parse/files/f3U4dybGW4Uk5BDIMMVWmN1Mnn142P3XFv8eigwn/0c497f9d0e6a1f80024f792e60a3dae7_event_image.jpg"
+      }
+      startDate: Fri Sep 29 2017 23:00:00 GMT-0700 (US Mountain Standard Time)
+      endDate: Sat Sep 30 2017 12:00:00 GMT-0700 (US Mountain Standard Time) {}
+      attendeeCount: 3
+    } //attributes
+  } //ParseObject
+] //ParseObjectList
+//URL Base for BASE+{image._name}: http://eventkey.herokuapp.com/parse/files/f3U4dybGW4Uk5BDIMMVWmN1Mnn142P3XFv8eigwn/
+//or {image._url}
 
-constructor() {
-  super();
-  // this.state = {
-  //   //var: "value"
-  // };//state
-}//constructor
-
-
-const Events = [
-  "Event Name1",
-  "Event Name1"
-].map( (key) => <th>{key}</th> );
-const photos = [
-  "p1",
-  "p2"
-];
-const names = [
-  "n1",
-  "n2"
-];
-const dates = [
-  "d1",
-  "d2"
-];
-const times = [
-  "t1",
-  "t2"
-];
-const attendeeCounts = [
-  "ac1",
-  "ac2"
-];
-
+Structure:
+ParseObjectList
+  *ParseObject
+    className: "Event"
+    id: "CaeDGEuzVc"
+    _objCount: 198
+    *attributes: {
+      **attendeeCount: 3
+      createdAt: Fri Sep 29 2017 00:11:22 GMT-0700 (US Mountain Standard Time) {}
+      **endDate: Sat Sep 30 2017 12:00:00 GMT-0700 (US Mountain Standard Time) {}
+      host: ParseUser {
+        className: "_User"
+        id: "rAsoCSwr14"
+        _objCount: 1
+        attributes: {} {}
+        createdAt: undefined
+        updatedAt: undefined
+      }
+      image: ParseFile {
+        _name: "0c497f9d0e6a1f80024f792e60a3dae7_event_image.jpg"
+        **_url: "http://eventkey.herokuapp.com/parse/files/f3U4dybGW4Uk5BDIMMVWmN1Mnn142P3XFv8eigwn/0c497f9d0e6a1f80024f792e60a3dae7_event_image.jpg"
+      }
+      isPending: false
+      location: ParseGeoPoint {
+        _latitude/latitude: 48.856614
+        _longitude/longitude: 2.3522219
+      }
+      **name: "Startup Weekend Artificial Intelligence - Paris 2nd Edition"
+      openDate: Fri Sep 29 2017 20:00:00 GMT-0700 (US Mountain Standard Time)
+      **startDate: Fri Sep 29 2017 23:00:00 GMT-0700 (US Mountain Standard Time)
+      updatedAt: Fri Sep 29 2017 15:15:40 GMT-0700 (US Mountain Standard Time)
+    }
+    createdAt: Fri Sep 29 2017 00:11:22 GMT-0700 (US Mountain Standard Time)
+    updatedAt: Fri Sep 29 2017 15:15:40 GMT-0700 (US Mountain Standard Time)
 */

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import logo from '../../assets/logo.svg';
 import '../../css/App.css';
+import Keys from "../other/Keys.key.js"; //better to import where needed. Don't place where need to pass to other Components.
+import Parse from "parse";
 //import { Col } from "react-bootstrap";
 
 //Components
@@ -10,10 +12,12 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      //var: "value"
+      "appId": Keys.appId,
+      "serverURL": Keys.serverURL,
     };//state
   }//constructor
   render() {
+    parsePrepInit(this.state.serverURL, this.state.appId);
     return (
       <div className="App">
         <div className="App-header">
@@ -25,6 +29,12 @@ class App extends Component {
       </div>
     );
   }
-}
+  /*global parsePrepInit*/
+  parsePrepInit (serverURL, appId) {
+    Parse.initialize(appId);
+    Parse.serverURL = serverURL;
+  }
+
+} //class App
 
 export default App;

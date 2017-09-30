@@ -35,5 +35,6 @@
   "homepage": "https://github.com/slopez15/InterviewSkillAssessment#readme",
   "devDependencies": {
     "create-react-app": "^1.4.0"
-  }
+  },
+  "dependencies": {}
 }
