@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
-import { connect } from "react-redux";
 
-@connect((store)=>{
-  return {
-    foo: 1,
-  };
-})
-import Keys from "../Keys.key";
 import '../css/App.css';
 import logo from '../assets/logo.svg';
-
+import Event from "./Event";
+//creates a layout and adds other components onto the page.
 class App extends Component {
   render() {
     return (
@@ -25,6 +19,4 @@ class App extends Component {
     );
   }
 }
-//To get started, edit <code>src/App.js</code> and save to reload.
-
 export default App;

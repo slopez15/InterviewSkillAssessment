@@ -1,10 +1,10 @@
-const state = {
-  users: [],
+const _state = {
   fetching: false,
   fetched: false,
   error: null,
 };
-export default function reducer(state, action){
+//handles actions triggered via dispatch. Named accordingly for react-promise-middleware.
+export default function reducer(state=_state, action){  //Do not assign within. {stateName}. Otherwise, state will be a {} in userReducer with props, instead of state props within userReducer.
   switch (action.type) {
     case "FETCH_USER_DATA_PENDING":{
       return {...state, fetching: true};
