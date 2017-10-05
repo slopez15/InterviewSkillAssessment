@@ -36,5 +36,5 @@
   "devDependencies": {
     "create-react-app": "^1.4.0"
   },
-  "dependencies": {}
+  "dependencies": {},
 }
