@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Table } from "react-bootstrap";
-import { Parse } from "parse";
-// import { Parse } from "parse-server";
-import Keys from "../other/Keys.key.js"; //better to import where needed. Don't place where need to pass to other Components.
+
+//actions
+//const dirActions = "../actions/";
+import actions from "../actions/actions.js";
 
 /* TODO
 unit tests
@@ -11,46 +12,26 @@ deploy Heroku
 SEND COMPLETED PROJECT TO: Keyul Shah - Keyul@asu.edu
 GitHub repository – to see the code
 Heroku deployment URL – to see the actual working project
-
 */
 
+//Need a way for site to update after getting data from elsewhere.
 export default class Event extends Component {
   constructor(){
     super();
     this.state = {
-      "userId": Keys.userId,
       "tableHeading": null,
       "events": null,
-    };//Need a way for site to update after getting data from elsewhere.
+    };
   }
+  // componentWillMount() {
+  //   this.props.dispatch(fetchUserEventData());
+  // }
+
   render() {
-    const tableHeading = getTableHeading();
-    const userEventData = getUserEventData (this.state.userId);
-    const userEventDataFormatted = getUserEventDataFormatted (userEventData);
-
-
-    // {tableHeading}
-    //   {jsxEventsData}
-    //HTML <Event />
-    return (
-      <div className="Event">
-        <h1>Below is a list of events from user {this.state.userId}!</h1>
-        <Table striped bordered condensed hover>
-          <thead>
-            <tr>
-
-            </tr>
-          </thead>
-          <tbody>
-
-          </tbody>
-        </Table>
-
-      </div>
-    );
-  }
-  /*global getTableHeading*/
-  getTableHeading () {
+    // const tableHeading = getTableHeading();
+    // const userEventData = getUserEventData (this.state.userId);
+    // const userEventDataFormatted = getUserEventDataFormatted (userEventData);
+    //const { actions } = this.props;
     const tableHeading = [
       "#",
       "eventPhoto",
@@ -59,43 +40,75 @@ export default class Event extends Component {
       "eventTime",
       "eventAttendeeCount",
     ].map( (key, i) => <th key={i}>{key}</th> );
-    this.setState({ tableHeading });
-    return tableHeading;
-  }
-  /*global getUserEventData*/
-  getUserEventData (_userId){
-    //Obtain past events, and event data, of a particular user. //should return a list of event objects and their details. [{event1Data}, ...]
+    // this.setState({ tableHeading });
+
+
+
+    //HTML <Event />
     return (
-      Parse.Cloud.run('getCheckIn', { userId: _userId }).then( (ParseObjectList) => {
-        console.log("ParseObjectList: ", ParseObjectList);
-        return (ParseObjectList.map( (ParseObject, i) => {
-          let eventData = ParseObject.attributes;
-          let eventPhoto = eventData.image._url;
-          let eventName = eventData.name;
-          //TODO Decide: Should I split start/end date into start/end date & start/end time.
-          let eventStartDate = eventData.startDate;
-          let eventEndDate = eventData.endDate;
-          let eventAttendeeCount = eventData.attendeeCount;
-          return ({ eventPhoto, eventName, eventStartDate, eventEndDate, eventAttendeeCount });
-        }));
-      }).then( (events) => {
-        this.setState({ events });
-        console.log("events: ", events);
-        return events;
-      })
+      <div className="Event">
+        <h1>Below is a list of events from user {this.state.userId}!</h1>
+        <Table striped bordered condensed hover>
+          <thead>
+            <tr>
+              {tableHeading}
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.events}
+          </tbody>
+        </Table>
+
+      </div>
     );
   }
-  /*global getUserEventDataFormatted*/
-  getUserEventDataFormatted (_userEventData){
-    return (
-      _userEventData.then( (events) => {
-        //events is [{}, {}, (...)]
-        return (events.map( (key, i) =>
-          <tr key={i}><td key={i}>{i}</td><td>{key.eventPhoto}</td><td>{key.eventName}</td><td>{key.eventStartDate}</td><td>{key.eventEndDate}</td><td>{key.eventAttendeeCount}</td></tr>
-        ))
-      })
-    );
-  }
+  // /*global getTableHeading*/
+  // getTableHeading () {
+  //   const tableHeading = [
+  //     "#",
+  //     "eventPhoto",
+  //     "eventName",
+  //     "eventDate",
+  //     "eventTime",
+  //     "eventAttendeeCount",
+  //   ].map( (key, i) => <th key={i}>{key}</th> );
+  //   this.setState({ tableHeading });
+  //   return tableHeading;
+  // }
+  // /*global getUserEventData*/
+  // getUserEventData (_userId){
+  //   //Obtain past events, and event data, of a particular user. //should return a list of event objects and their details. [{event1Data}, ...]
+  //   return (
+  //     Parse.Cloud.run('getCheckIn', { userId: _userId }).then( (ParseObjectList) => {
+  //       console.log("ParseObjectList: ", ParseObjectList);
+  //       return (ParseObjectList.map( (ParseObject, i) => {
+  //         let eventData = ParseObject.attributes;
+  //         let eventPhoto = eventData.image._url;
+  //         let eventName = eventData.name;
+  //         //TODO Decide: Should I split start/end date into start/end date & start/end time.
+  //         let eventStartDate = eventData.startDate;
+  //         let eventEndDate = eventData.endDate;
+  //         let eventAttendeeCount = eventData.attendeeCount;
+  //         return ({ eventPhoto, eventName, eventStartDate, eventEndDate, eventAttendeeCount });
+  //       }));
+  //     }).then( (events) => {
+  //       this.setState({ events });
+  //       console.log("events: ", events);
+  //       return events;
+  //     })
+  //   );
+  // }
+  // /*global getUserEventDataFormatted*/
+  // getUserEventDataFormatted (_userEventData){
+  //   return (
+  //     _userEventData.then( (events) => {
+  //       //events is [{}, {}, (...)]
+  //       return (events.map( (key, i) =>
+  //         <tr key={i}><td key={i}>{i}</td><td>{key.eventPhoto}</td><td>{key.eventName}</td><td>{key.eventStartDate}</td><td>{key.eventEndDate}</td><td>{key.eventAttendeeCount}</td></tr>
+  //       ))
+  //     })
+  //   );
+  // }
 
 
 
@@ -106,6 +119,28 @@ export default class Event extends Component {
 /* SCRATCH
 //const { eventPhoto,  eventName,  eventDate,  eventTime, eventAttendeeCount } = this.props;
 //<Col xs={6} md={4}>{Events}</Col>
+
+//stringJSX - String style
+// console.log(key.eventName);
+  // let stringJSX =
+  //   "<tr key=" + i + ">" +
+  //     "<td key=" + i + ">" + i + "</td>" +
+  //     "<td>" + key.eventPhoto + "</td>" +
+  //     "<td>" + key.eventName + "</td>" +
+  //     "<td>" + key.eventStartDate + "</td>" +
+  //     "<td>" + key.eventEndDate + "</td>" +
+  //     "<td>" + key.eventAttendeeCount + "</td>" +
+  //   "</tr>"; //TODO wrong? shouldn't be text string.
+// console.log(stringJSX);
+//   return stringJSX;
+// });
+//TIP: Not allowed to setState inside render
+// this.setState({events : eventsJSX});
+*/
+/*
+REMEMBER
+window.var = var; //allows access to var in browser console.
+(arr.map(key, i) = > stuff)
 */
 
 
